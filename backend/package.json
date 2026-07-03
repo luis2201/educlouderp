@@ -1,0 +1,24 @@
+{
+  "name": "educlouderp-backend",
+  "version": "0.1.0",
+  "description": "Backend API para EduCloudERP",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "bootstrap:superadmin": "node scripts/bootstrap-superadmin.js",
+    "test": "node --test",
+    "test:security": "node --test tests/integration/security.test.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

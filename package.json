@@ -1,0 +1,14 @@
+{
+  "name": "educlouderp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ERP educativo con backend Node/Express, PostgreSQL y frontend React/Vite.",
+  "scripts": {
+    "dev": "docker compose up -d",
+    "stop": "docker compose down",
+    "logs": "docker compose logs -f",
+    "backend:test": "docker compose exec -T backend npm test",
+    "frontend:lint": "docker compose exec -T frontend npm run lint",
+    "frontend:build": "docker compose exec -T frontend npm run build"
+  }
+}
