@@ -15,7 +15,7 @@ Base URL:
 - El token solo se muestra una vez, al iniciar sesión.
 - En base se guarda `token_hash`, no el token original.
 - Las sesiones viven en `erp.sesion_usuario`.
-- Las acciones `LOGIN` y `LOGOUT` registran auditoría.
+- Las acciones `LOGIN`, `LOGOUT` y cambio de contraseña propia registran auditoría.
 
 ## Login
 
@@ -80,6 +80,30 @@ GET /api/auth/me
 Authorization: Bearer TOKEN_OPACO
 ```
 
+## Cambiar Contraseña Propia
+
+```http
+PATCH /api/auth/password
+Authorization: Bearer TOKEN_OPACO
+```
+
+Payload:
+
+```json
+{
+  "password_actual": "Temporal123",
+  "password": "NuevaClave123",
+  "confirmar_password": "NuevaClave123"
+}
+```
+
+Reglas:
+
+- Valida la contraseña actual antes de guardar.
+- La nueva contraseña debe tener al menos 8 caracteres.
+- La nueva contraseña debe ser diferente a la actual.
+- Al guardar, `debe_cambiar_clave` queda en `false`.
+
 ## Logout
 
 ```http
@@ -113,7 +137,11 @@ usuario.editar  para cerrar sesiones
 ```text
 400 El campo usuario es requerido
 400 El campo password es requerido
+400 La nueva contraseña debe tener al menos 8 caracteres
+400 La confirmación de contraseña no coincide
+400 La nueva contraseña debe ser diferente a la actual
 401 Credenciales inválidas
+401 La contraseña actual no es correcta
 401 Token de sesión requerido
 401 Sesión inválida o expirada
 401 Sesión inválida o ya cerrada

@@ -6,6 +6,7 @@ const router = Router();
 
 router.post('/login', asyncHandler(authController.login));
 router.get('/me', asyncHandler(authController.me));
+router.patch('/password', asyncHandler(authController.cambiarClaveActual));
 router.post('/logout', asyncHandler(authController.logout));
 
 module.exports = router;

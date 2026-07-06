@@ -24,6 +24,14 @@ async function logout(req, res) {
   });
 }
 
+async function cambiarClaveActual(req, res) {
+  const usuario = await authService.cambiarClaveActual(req.body, { req });
+
+  res.json({
+    data: usuario
+  });
+}
+
 async function listarSesionesUsuario(req, res) {
   const sessions = await authService.listarSesionesUsuario(req.params.id, req.query);
 
@@ -63,6 +71,7 @@ module.exports = {
   login,
   me,
   logout,
+  cambiarClaveActual,
   listarSesionesUsuario,
   obtenerSesionUsuario,
   cerrarSesionUsuario,

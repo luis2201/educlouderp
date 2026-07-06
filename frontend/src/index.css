@@ -79,4 +79,38 @@
     border-collapse: separate;
     border-spacing: 0;
   }
+
+  .erp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .erp-table th,
+  .erp-table td {
+    border-right: 1px solid hsl(var(--border));
+  }
+
+  .erp-table th:last-child,
+  .erp-table td:last-child {
+    border-right: 1px solid hsl(var(--border));
+  }
+
+  .erp-table tr:last-child td {
+    border-bottom-width: 0;
+  }
+
+  .erp-table-edge {
+    border-left: 4px solid hsl(var(--brand-sky));
+  }
+
+  .dashboard-panel {
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    background: hsl(var(--card) / 0.97);
+    box-shadow:
+      0 14px 34px hsl(211 100% 20% / 0.08),
+      0 1px 0 hsl(0 0% 100% / 0.8) inset;
+    backdrop-filter: blur(10px);
+  }
 }

@@ -89,6 +89,40 @@ async function findById(id) {
   return result.rows[0] || null;
 }
 
+async function findByIdWithPassword(id) {
+  const result = await query(`
+    SELECT
+      u.id,
+      u.persona_id,
+      u.username,
+      u.email_acceso,
+      u.password_hash,
+      u.estado,
+      u.ultimo_acceso,
+      u.debe_cambiar_clave,
+      u.intentos_fallidos,
+      u.bloqueado_hasta,
+      u.metadata,
+      u.created_at,
+      u.updated_at,
+      jsonb_build_object(
+        'id', p.id,
+        'tipo_identificacion', p.tipo_identificacion,
+        'identificacion', p.identificacion,
+        'nombres', p.nombres,
+        'apellidos', p.apellidos,
+        'correo', p.correo,
+        'estado', p.estado
+      ) AS persona
+    FROM erp.usuario u
+    INNER JOIN erp.persona p ON p.id = u.persona_id
+    WHERE u.id = $1
+    LIMIT 1
+  `, [id]);
+
+  return result.rows[0] || null;
+}
+
 async function findByCredential(credential) {
   const result = await query(`
     SELECT
@@ -222,6 +256,7 @@ async function updatePassword(id, data) {
 module.exports = {
   findAll,
   findById,
+  findByIdWithPassword,
   findByCredential,
   registrarLoginExitoso,
   registrarLoginFallido,

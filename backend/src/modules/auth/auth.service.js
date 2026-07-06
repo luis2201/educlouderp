@@ -3,7 +3,7 @@ const authRepository = require('./auth.repository');
 const usuariosRepository = require('../usuarios/usuarios.repository');
 const { httpError } = require('../../shared/httpErrors');
 const { registrarAuditoria } = require('../../shared/audit/audit.service');
-const { verifyPassword } = require('../../shared/security/passwords');
+const { hashPassword, verifyPassword } = require('../../shared/security/passwords');
 const { generateSessionToken, hashSessionToken } = require('../../shared/security/tokens');
 
 function getDurationMinutes() {
@@ -25,6 +25,16 @@ function normalizePassword(value) {
 
   if (!password) {
     throw httpError(400, 'El campo password es requerido');
+  }
+
+  return password;
+}
+
+function normalizeNewPassword(value) {
+  const password = normalizePassword(value);
+
+  if (password.length < 8) {
+    throw httpError(400, 'La nueva contraseña debe tener al menos 8 caracteres');
   }
 
   return password;
@@ -181,6 +191,60 @@ async function logout(req) {
   return session;
 }
 
+async function cambiarClaveActual(payload = {}, context = {}) {
+  const req = context.req;
+  const session = await obtenerSesionActual(req);
+  const usuario = await usuariosRepository.findByIdWithPassword(session.usuario.id);
+
+  if (!usuario) {
+    throw httpError(404, 'Usuario no encontrado');
+  }
+
+  const currentPassword = normalizePassword(
+    payload.password_actual ?? payload.current_password ?? payload.passwordActual
+  );
+  const newPassword = normalizeNewPassword(
+    payload.password ?? payload.nueva_clave ?? payload.new_password ?? payload.nuevaClave
+  );
+  const confirmPassword = payload.confirmar_password ?? payload.confirm_password ?? payload.confirmarPassword;
+
+  if (confirmPassword !== undefined && String(confirmPassword) !== newPassword) {
+    throw httpError(400, 'La confirmación de contraseña no coincide');
+  }
+
+  if (!verifyPassword(currentPassword, usuario.password_hash)) {
+    throw httpError(401, 'La contraseña actual no es correcta');
+  }
+
+  if (verifyPassword(newPassword, usuario.password_hash)) {
+    throw httpError(400, 'La nueva contraseña debe ser diferente a la actual');
+  }
+
+  const usuarioActualizado = await usuariosRepository.updatePassword(usuario.id, {
+    passwordHash: hashPassword(newPassword),
+    debeCambiarClave: false
+  });
+
+  await registrarAuditoria({
+    req,
+    modulo: 'seguridad',
+    entidad: 'usuario',
+    entidadId: usuarioActualizado.id,
+    accion: 'CAMBIAR_CLAVE_PROPIA',
+    valorAnterior: {
+      id: usuario.id,
+      debe_cambiar_clave: usuario.debe_cambiar_clave
+    },
+    valorNuevo: {
+      id: usuarioActualizado.id,
+      debe_cambiar_clave: usuarioActualizado.debe_cambiar_clave
+    },
+    personaId: usuario.persona_id
+  });
+
+  return sanitizeUsuario(usuarioActualizado);
+}
+
 async function listarSesionesUsuario(usuarioId, filters = {}) {
   const estado = normalizeEstadoSesion(filters.estado);
   return authRepository.findSessionsByUser(usuarioId, { estado });
@@ -241,6 +305,7 @@ module.exports = {
   login,
   obtenerSesionActual,
   logout,
+  cambiarClaveActual,
   listarSesionesUsuario,
   obtenerSesionUsuario,
   cerrarSesionUsuario,
