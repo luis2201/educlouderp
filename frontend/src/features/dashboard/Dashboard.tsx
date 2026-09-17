@@ -25,6 +25,7 @@ import {
   School,
   Settings,
   ShieldCheck,
+  UserCog,
   UserPlus,
   Users
 } from 'lucide-react';
@@ -49,7 +50,9 @@ import { cn } from '@/lib/utils';
 import type { MeResponse } from '@/features/auth/auth.types';
 import { InstitucionesCrud } from '@/features/instituciones/InstitucionesCrud';
 import { PersonasCrud } from '@/features/personas/PersonasCrud';
+import { RolesPermisosCrud } from '@/features/seguridad/RolesPermisosCrud';
 import { SedesCrud } from '@/features/sedes/SedesCrud';
+import { UsuariosCrud } from '@/features/usuarios/UsuariosCrud';
 
 type ListResponse<T> = {
   data: T[];
@@ -113,6 +116,7 @@ const modules = [
   { id: 'instituciones', label: 'Instituciones', icon: Building2 },
   { id: 'sedes', label: 'Sedes', icon: MapPin },
   { id: 'personas', label: 'Personas', icon: Users },
+  { id: 'usuarios', label: 'Usuarios', icon: UserCog },
   { id: 'roles', label: 'Roles y permisos', icon: ShieldCheck },
   { id: 'periodos', label: 'Periodos', icon: BookOpen },
   { id: 'parametros', label: 'Parámetros', icon: Settings }
@@ -204,12 +208,12 @@ export function Dashboard({ onLogout }: DashboardProps) {
   });
   const rolesQuery = useQuery({
     queryKey: ['seguridad', 'roles'],
-    queryFn: () => apiRequest<ListResponse<Rol>>('/api/seguridad/roles'),
+    queryFn: () => apiRequest<ListResponse<Rol>>('/api/roles'),
     enabled: meQuery.isSuccess
   });
   const permisosQuery = useQuery({
     queryKey: ['seguridad', 'permisos'],
-    queryFn: () => apiRequest<ListResponse<Permiso>>('/api/seguridad/permisos'),
+    queryFn: () => apiRequest<ListResponse<Permiso>>('/api/permisos'),
     enabled: meQuery.isSuccess
   });
   const parametrosQuery = useQuery({
@@ -437,8 +441,10 @@ export function Dashboard({ onLogout }: DashboardProps) {
         {activeModule === 'instituciones' ? <InstitucionesCrud /> : null}
         {activeModule === 'sedes' ? <SedesCrud /> : null}
         {activeModule === 'personas' ? <PersonasCrud /> : null}
+        {activeModule === 'usuarios' ? <UsuariosCrud /> : null}
+        {activeModule === 'roles' ? <RolesPermisosCrud /> : null}
 
-        {!['instituciones', 'sedes', 'personas'].includes(activeModule) ? (
+        {!['instituciones', 'sedes', 'personas', 'usuarios', 'roles'].includes(activeModule) ? (
         <section className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-[1.45fr_0.9fr]">
             <div className="elevated-panel overflow-hidden rounded-lg border bg-primary text-primary-foreground">

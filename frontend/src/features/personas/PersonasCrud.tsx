@@ -58,7 +58,7 @@ const personaSchema = z.object({
   nombres: z.string().trim().min(2, 'Ingrese los nombres').max(120, 'Máximo 120 caracteres'),
   apellidos: z.string().trim().min(2, 'Ingrese los apellidos').max(120, 'Máximo 120 caracteres'),
   fecha_nacimiento: optionalDate,
-  genero: z.string().trim().optional(),
+  genero: z.enum(['', 'MASCULINO', 'FEMENINO']),
   correo: optionalEmail,
   telefono: z.string().trim().optional(),
   direccion: z.string().trim().optional(),
@@ -87,7 +87,7 @@ function toFormValues(persona: Persona): PersonaValues {
     nombres: persona.nombres,
     apellidos: persona.apellidos,
     fecha_nacimiento: persona.fecha_nacimiento || '',
-    genero: persona.genero || '',
+    genero: (persona.genero || '') as PersonaValues['genero'],
     correo: persona.correo || '',
     telefono: persona.telefono || '',
     direccion: persona.direccion || '',
@@ -387,7 +387,14 @@ export function PersonasCrud() {
                   <Input type="date" {...form.register('fecha_nacimiento')} />
                 </Field>
                 <Field label="Género" error={form.formState.errors.genero?.message}>
-                  <Input {...form.register('genero')} />
+                  <select
+                    className="h-10 w-full rounded-md border border-input bg-card px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                    {...form.register('genero')}
+                  >
+                    <option value="">Sin especificar</option>
+                    <option value="MASCULINO">Masculino</option>
+                    <option value="FEMENINO">Femenino</option>
+                  </select>
                 </Field>
               </div>
 
